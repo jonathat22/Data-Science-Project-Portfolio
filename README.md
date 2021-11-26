@@ -10,3 +10,4 @@ This repository contains assignments and projects I've done both for school and 
 
 * **Linear Models and RNA-Seq Data**: Classification of RNA seq data using linear models.
 * **PCA and Clustering with Spark**: Uncovering features and structures of 6-dimensional data
+* **Predicting GFP Brightness**: Engineering features to classify GFP mutants as "high brightness" or "low brightness".
