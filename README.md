@@ -1,6 +1,6 @@
 # Data Science Project Portfolio
 
-This repository contains assignments and projects I've done both for school and for my own education. I am interested in applying data science and machine learning techniques to life sciences problems, so you will find that my projects are mostly related to biology, or some other field of science...and pokemon.
+This repository contains assignments and projects I've done both for school and for my own education. I am interested in applying data science and machine learning techniques to life sciences problems, so you will find that my projects are mostly related to biology, or some other field of science.....and pokemon.
 
 * **Astro Data Mining**:  Mining pulsar radiofrequency signals using PySpark and the Bridges2 Supercomputer.
 
