@@ -1,0 +1,136 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2580
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 HelveticaNeue-Bold;\f2\fnil\fcharset0 Menlo-Regular;
+}
+{\colortbl;\red255\green255\blue255;\red0\green239\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cspthree\c0\c92669\c100000;\cspthree\c0\c0\c0;}
+\margl1440\margr1440\vieww21840\viewh12940\viewkind0
+\deftab560
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\fs26 \cf0 rdd = sc.textFile("pulsar.dat")\
+\
+split_rdd = rdd.map(
+\f1\b lambda
+\f0\b0  x: x.split())\
+\
+float_rdd = split_rdd.map(
+\f1\b lambda
+\f0\b0  xs: [float(x) 
+\f1\b for
+\f0\b0  x 
+\f1\b in
+\f0\b0  xs])\
+\
+round_rdd = float_rdd.map(
+\f1\b lambda
+\f0\b0  xr: [round(x, 1) 
+\f1\b for
+\f0\b0  x 
+\f1\b in
+\f0\b0  xr])\
+\
+round_df = spark.createDataFrame(round_rdd, ["Ascension", "Declination", "Time", "Frequency"])\
+\
+\
+round_df.agg(\{"Ascension": "max"\}).show() \
+round_df.agg(\{"Ascension": "min"\}).show()\
+
+\f1\b # I found the range of values for the Ascension and Declination values and found that   the minimum is ~59 and the maximum is ~120.
+\f0\b0 \
+\
+round_df.agg(\{"Frequency": "max"\}).show()\
+round_df.agg(\{"Frequency": "min"\}).show()\
+
+\f1\b # The range of frequency values is: minimum = ~1000, maximum = ~7999, so I should then filter by frequency values, rather than Degree values.
+\f0\b0 \
+\
+
+\f1\b # Finding the most common frequency values\
+
+\f0\b0 round_df.select("Frequency").rdd.map(
+\f1\b lambda
+\f0\b0  x: (x, 1)).reduceByKey(
+\f1\b lambda
+\f0\b0  x, y: x + y).map(
+\f1\b lambda
+\f0\b0  x: (x[1], x[0])).sortByKey(
+\f1\b False
+\f0\b0 ).take(5)\
+\
+\
+
+\f1\b # I Inspected the rows for each of the common Frequency Values and found the largest signal to be at ~2746.4. I reasoned that I would find the most matching Ascension and Declination pairs if I looked at the most common frequency.\
+
+\f0\b0 round_df.filter(round_df.Frequency.contains("2746.")).orderBy(round_df.Time).show(500)\
+\
+
+\f1\b # Removing the rows that are clearly not part of the signal\
+
+\f0\b0 round_df.filter(round_df.Frequency.contains("2746.")).where(round_df.Declination != "65.7").where(round_df.Declination != "117.7").orderBy(round_df.Time).show(500)\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab560\pardirnatural\partightenfactor0
+
+\f2\fs36 \cf2 \cb3 \CocoaLigature0 +---------+-----------+------+---------+\
+|Ascension|Declination|  Time|Frequency|\
++---------+-----------+------+---------+\
+|    105.9|      108.1|3172.0|   2746.4|\
+|    105.9|      107.9|3176.6|   2746.4|\
+|    105.9|      107.8|3181.2|   2746.5|\
+|    105.9|      108.0|3185.8|   2746.4|\
+|    105.8|      107.9|3190.4|   2746.4|\
+|    105.8|      108.1|3195.0|   2746.6|\
+|    106.1|      108.0|3199.6|   2746.3|\
+|    106.1|      108.0|3204.2|   2746.5|\
+|    106.0|      107.7|3208.8|   2746.5|\
+|    105.9|      107.9|3213.4|   2746.4|\
+|    106.0|      108.1|3218.1|   2746.2|\
+|    105.8|      107.9|3222.7|   2746.4|\
++---------+-----------+------+---------+
+\f0\fs26 \cf0 \cb1 \CocoaLigature1 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 \
+\
+\
+
+\f1\b # Returning the signal as full floats\
+
+\f0\b0 float_df = spark.createDataFrame(float_rdd, ["Ascension", "Declination", "Time", "Frequency"])\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 float_df.filter(float_df.Frequency.contains("2746.")).where(float_df.Time > 3000).orderBy(float_df.Time).show(500)\
+\
+\
+
+\f1\b This is the largest signal I got. All of the time intervals are 4.6 seconds. The Ascension values are within the range 105.8-106.1, and the Declination Values are within the range 107.8-108.1. The Frequency values are mostly around 2746.4. Not all of these values are within 0.1 of each other but this is expected because 0.1 is the standard deviation of the error, meaning that ~1/3 of the values will actually not be within that error bound. \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab560\pardirnatural\partightenfactor0
+
+\f2\b0\fs36 \cf2 \cb3 \CocoaLigature0 +------------------+------------------+------------------+------------------+\
+|         Ascension|       Declination|              Time|         Frequency|\
++------------------+------------------+------------------+------------------+\
+|105.94397857968599|108.05310354123745| 3172.029623912569| 2746.432057668388|\
+|105.94252446410798|  107.899735319959|3176.6309465121435| 2746.387408240721|\
+| 105.9430248362607| 107.8108682056616| 3181.234860292676|2746.4925721118357|\
+|105.92243195474313| 108.0192673084883|3185.8354397789008|2746.4119330244152|\
+| 105.8346499573229|107.92783771054873|3190.4388028527496|2746.4198672601924|\
+|105.79545747787967|108.07494963118651| 3195.039970148096|2746.5905943255584|\
+|106.10029252972402|108.02366039385102| 3199.641496233176| 2746.338542888442|\
+|106.12442992638184| 108.0097162128027|3204.2453209990035|2746.5258325739355|\
+|106.01123840158803|107.71008414008513|3208.8483774540173|2746.4779974408425|\
+|105.93111440798296|107.87147998701266| 3213.448367123999| 2746.440688437441|\
+|106.01355773673716|108.11224554287973| 3218.051579477543| 2746.183111971203|\
+|105.82480227582268|107.92912143609028|3222.6521726071487| 2746.395611338722|\
++------------------+------------------+------------------+------------------+
+\f1\b\fs26 \cf0 \cb1 \CocoaLigature1 \
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\b0 \cf0 \
+\
+\
+\
+\
+\
+\
+}
