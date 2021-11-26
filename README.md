@@ -9,3 +9,4 @@ This repository contains assignments and projects I've done both for school and 
 
 
 * **Linear Models and RNA-Seq Data**: Classification of RNA seq data using linear models.
+* **PCA and Clustering with Spark**
