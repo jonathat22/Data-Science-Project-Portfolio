@@ -8,7 +8,7 @@ This repository contains assignments and projects I've done both for school and 
 
 * **Comparing Human and Elephant p53 Genes**: Comparing and contrasting the Human and Elephant P53 genes.
   * Included in these files are the human and elephant p53 gene sequences, and python scripts containing my code and test functions, respectively. I unit tested each of my functions using pytest.
-  * The jupyter notebook contains the same python code organized by cell such that the execution of the code can be followed through to the output.
+  * The jupyter notebook contains the same python code, plus explanations of each step written in markdown. The code is organized by cell such that the execution of the code can be followed through to the output.
 
 * **Astro Data Mining**:  Mining pulsar radiofrequency signals using PySpark and the Bridges2 Supercomputer.
 
