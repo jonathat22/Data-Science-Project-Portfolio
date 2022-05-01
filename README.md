@@ -18,3 +18,4 @@ This repository contains assignments and projects I've done both for school and 
 * **Predicting GFP Brightness**: Engineering features to classify GFP mutants as "high brightness" or "low brightness".
 
 * **Statistical Analysis Predicting Civil Wars using R**: https://www.stat.cmu.edu/capstoneresearch/600files/poster1.pdf
+*  **UNET for Image Segmentation**: Image segmentation is an important problem in computer vision and has potential applications if biology and medical image analysis. In this notebook, I implement the U-net architecture and apply it to a dataset containing cell nuclei.
